@@ -2,15 +2,23 @@ import { defineStore } from 'pinia';
 import type { Spot } from '../models/spot';
 import { SpotCategory } from '../constants/spot';
 import { spotApi } from '../api/spotApi';
+import { useCatalogStore } from './catalogStore';
 
+// 景点目录的唯一数据源是 catalogStore（可续作的目录版本）。
+// 这里只保留搜索/筛选/收藏这类页面态，spots 直接透传目录，避免两份状态不一致。
 export const useSpotStore = defineStore('spot', {
-  state: () => ({ spots: spotApi.list() as Spot[], keyword: '', category: 'all' as SpotCategory | 'all', favorites: [] as string[] }),
+  state: () => ({ keyword: '', category: 'all' as SpotCategory | 'all', favorites: [] as string[] }),
   getters: {
-    filteredSpots: (state) => state.spots.filter((spot) => {
-      const matchKeyword = !state.keyword || spot.name.includes(state.keyword) || spot.tags.some((tag) => tag.includes(state.keyword));
-      const matchCategory = state.category === 'all' || spot.category === state.category;
-      return matchKeyword && matchCategory;
-    }),
+    spots(): Spot[] {
+      return useCatalogStore().spots;
+    },
+    filteredSpots(): Spot[] {
+      return this.spots.filter((spot) => {
+        const matchKeyword = !this.keyword || spot.name.includes(this.keyword) || spot.tags.some((tag) => tag.includes(this.keyword));
+        const matchCategory = this.category === 'all' || spot.category === this.category;
+        return matchKeyword && matchCategory;
+      });
+    },
   },
   actions: {
     toggleFavorite(id: string) {
@@ -18,4 +26,3 @@ export const useSpotStore = defineStore('spot', {
     },
   },
 });
-
