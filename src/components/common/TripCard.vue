@@ -1,7 +1,7 @@
 <template>
   <article class="trip-card">
     <div>
-      <strong>{{ trip.title }}</strong>
+      <strong>{{ trip.title }} <el-tag size="small">r{{ trip.revision }}</el-tag></strong>
       <p class="muted">{{ trip.destination }} · {{ formatDate(trip.start_date) }} - {{ formatDate(trip.end_date) }}</p>
     </div>
     <el-tag>{{ tripStatusText[trip.status] }}</el-tag>
@@ -21,4 +21,3 @@ defineEmits<{ open: [id: string]; remove: [id: string] }>();
 <style scoped>
 .trip-card { background: #fff; border: 1px solid #dbe7cf; border-radius: 8px; padding: 18px; }
 </style>
-

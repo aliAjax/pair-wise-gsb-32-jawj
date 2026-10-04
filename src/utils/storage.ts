@@ -8,11 +8,20 @@ class TripWeaverDb extends Dexie {
   dayPlans!: Table<unknown, string>;
   constructor() {
     super('tripweaver');
-    this.version(1).stores({ trips: 'id,status,destination', spots: 'id,category', dayPlans: 'id,trip_id,day_index' });
+    this.version(2).stores({ trips: 'id,status,destination', spots: 'id,category', dayPlans: 'id,trip_id,day_index' });
   }
 }
 
 export const db = new TripWeaverDb();
+const FAILURE_KEY = '__tripweaver_fail_storage_once__';
+
+export function armStorageFailureOnce() {
+  localStorage.setItem(FAILURE_KEY, String(Date.now()));
+}
+
+export function clearStorageFailure() {
+  localStorage.removeItem(FAILURE_KEY);
+}
 
 export function loadLocal<T>(key: string, fallback: T): T {
   try {
@@ -27,6 +36,9 @@ export function loadLocal<T>(key: string, fallback: T): T {
 }
 
 export function saveLocal<T>(key: string, data: T) {
+  if (localStorage.getItem(FAILURE_KEY)) {
+    localStorage.removeItem(FAILURE_KEY);
+    throw new Error(messages.storageWriteInterrupted);
+  }
   localStorage.setItem(key, JSON.stringify({ version: STORAGE_VERSION, data, updatedAt: new Date().toISOString() }));
 }
-

@@ -10,6 +10,6 @@ export interface Trip {
   currency: string;
   members: string[];
   status: TripStatus;
+  revision: number;
   created_at: string;
 }
-

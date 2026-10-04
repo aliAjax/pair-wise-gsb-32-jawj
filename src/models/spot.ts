@@ -14,3 +14,11 @@ export interface Spot {
   image: string;
 }
 
+export interface SpotSnapshot {
+  spot_id: string;
+  name: string;
+  category: SpotCategory;
+  price: number;
+  catalog_version: number;
+  snapshot_at: string;
+}
